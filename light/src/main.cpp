@@ -15,8 +15,8 @@
 
 CRGB leds[NUM_LEDS];
 
-const char* ssid = "Trung Hieu";
-const char* password = "23011992";
+const char* ssid = "Change_this_to_your_ssid";
+const char* password = "Change_this_to_your_ss_password";
 
 AsyncWebServer server(80);
 int myFunction(int, int);
