@@ -8,12 +8,17 @@
 #include "index.h"
 #include "login.h"
 #include "control_panel.h"
+#include "Setting.h"
 
 #define NUM_LEDS 55
 
 #define DATA_PIN 5
 
 CRGB leds[NUM_LEDS];
+
+const char* PARAM_INPUT = "value";
+
+String Brightness = "0";
 
 const char* ssid = "Change_this_to_your_ssid";
 const char* password = "Change_this_to_your_ss_password";
@@ -33,6 +38,11 @@ String processor(const String& var){
   if(var == "PLACEHOLDER")
     return "<h4><tr><th>esp1</th><th>no ida</th><th>" +btos(1)+ "</th></tr></h4>";
   else return "";
+
+    if (var == "SLIDERVALUE"){
+    return PARAM_INPUT;
+  }
+  return String();
 }
 
 void setup(){
@@ -64,7 +74,24 @@ void setup(){
   // Send a GET request to <ESP_IP>/update?output=<inputMessage1>&state=<inputMessage2>
   server.on("/login.html", HTTP_GET, [] (AsyncWebServerRequest *request) {
     request->send(200, "text/html", login_html);
+
   });
+
+  server.on("/setting", HTTP_GET, [] (AsyncWebServerRequest *request) {
+    String inputMessage;
+        // GET input1 value on <ESP_IP>/slider?value=<inputMessage>
+      if (request->hasParam(PARAM_INPUT)) {
+        inputMessage = request->getParam(PARAM_INPUT)->value();
+        Brightness = inputMessage;
+      }
+      else {
+        inputMessage = "No message sent";
+      }
+      Serial.println(inputMessage);
+      request->send(200, "text/plain", "OK");
+  });
+
+
   server.on("/ControlPanel.html", HTTP_GET, [] (AsyncWebServerRequest *request) {
     request->send_P(200, "text/html", Control_panel_html, processor);
   });
@@ -82,5 +109,5 @@ void setup(){
 }
 
 void loop() {
-  // put your main code here, to run repeatedly:
+
 }
