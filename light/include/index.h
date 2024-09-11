@@ -1,59 +1,77 @@
 const char *index_html = R"=====(<!DOCTYPE html>
 <html lang="en">
+
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>indexpage</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background-color: #f4f4f4;
-      align-items: center;
-      height: 100vh;
-      margin: 0;
-    }
-    ul {
-      list-style-type: none;
-      margin: 0;
-      padding: 0;
-      overflow: hidden;
-      background-color: #0d9c68;
-      display: flex;
-      justify-content: center;
-    }
-    li {
-      padding: 4vw;
-    }
-    li:hover {
-      background-color: blue;
-    }
-    a {
-      text-decoration: none;
-      color: white;
-      font-size: 5vh;
-    }
-    section {
-      text-align: center;
-      margin-top: 200px;
-    }
-  </style>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Light control</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #ffffff;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .header {
+            padding: 4vw;
+            overflow: hidden;
+            background-color: #001aff;
+            display: flex;
+            justify-content: center;
+            color: white;
+            font-size: 5vh;
+        }
+
+        .pagination {
+            display: inline-block;
+            display: flex;
+            justify-content: center;
+        }
+
+        .pagination a {
+            color: black;
+            float: left;
+            padding: 1vh 6vw;
+            text-decoration: none;
+            transition: background-color .3s;
+            border: 1px solid #ddd;
+        }
+
+        .pagination a.active {
+            background-color: #9265fa;
+
+        }
+    </style>
 </head>
+
 <body>
-  <div>
     <div>
-      <ul>
-        <li><a href="#">Trang chủ</a></li>
-        <li><a href="login.html">Bảng điều khiển</a></li>
-      </ul>
+        <div class="header">
+            Control panel
+        </div>
+        <div class="pagination">
+            <a href="#">Static mode</a>
+            <a href="#">Animated mode</a>
+            <a href="#" class="active">Setting</a>
+        </div>
+        <div>
+            <h1 class="contain"> Static light</h1>
+
+
+            %PLACEHOLDER%
+        </div>
     </div>
-    <section>
-      <h2>Trang chủ<br> Thùng rác thông minh</h2>
-      <p>
-        Đây là trang chủ điều khiển thùng rác thông minh của bạn.
-        <br> vui lòng đăng nhập để xác thực
-      </p>
-      <a href="login.html"> <button> Đăng nhập </button></a>
-    </section>
-  </div>
 </body>
+<script>
+    const colorInput = document.querySelector('input[type="color"]');
+
+    colorInput.addEventListener('change', (event) => {
+        const selectedColor = event.target.value;
+        const placeholderElement = document.querySelector('.contain');
+        placeholderElement.textContent = `Selected Color: ${selectedColor}`;
+    });
+</script>
+
 </html>)=====";
