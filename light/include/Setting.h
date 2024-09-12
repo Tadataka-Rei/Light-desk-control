@@ -7,7 +7,6 @@ const char *SETTING =R"=====(<!DOCTYPE html>
     <title>Light control</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
             background-color: #ffffff;
             align-items: center;
             height: 100vh;
@@ -25,7 +24,6 @@ const char *SETTING =R"=====(<!DOCTYPE html>
         }
 
         .pagination {
-            display: inline-block;
             display: flex;
             justify-content: center;
         }
@@ -35,7 +33,6 @@ const char *SETTING =R"=====(<!DOCTYPE html>
             float: left;
             padding: 1vh 6vw;
             text-decoration: none;
-            transition: background-color .3s;
             border: 1px solid #ddd;
         }
 
@@ -51,17 +48,17 @@ const char *SETTING =R"=====(<!DOCTYPE html>
             Control panel
         </div>
         <div class="pagination">
-            <a href="#" class="active">Static mode</a>
+            <a href="./index.html">Static mode</a>
             <a href="#">Animated mode</a>
-            <a href="#">Setting</a>
+            <a href="#" class="active">Setting</a>
         </div>
         <div>
             <h1 class="contain">Setting</h1>
 
-            <p><span id="textSliderValue">%BRIGHTNESS%</span></p>
+            <span id="textSliderValue">%BRIGHTNESS%</span></p>
             <p><input type="range" onchange="updateSliderPWM(this)" id="pwmSlider" min="0" max="255"
-                    value="%BRIGHTNESS%" step="1" class="slider"></p>
-            %PLACEHOLDER%
+                    value="%BRIGHTNESS%" step="1" class="slider">
+
         </div>
     </div>
 
@@ -69,9 +66,8 @@ const char *SETTING =R"=====(<!DOCTYPE html>
         function updateSliderPWM(element) {
             var sliderValue = document.getElementById("pwmSlider").value;
             document.getElementById("textSliderValue").innerHTML = sliderValue;
-            console.log(sliderValue);
             var xhr = new XMLHttpRequest();
-            xhr.open("GET", "/slider?value=" + sliderValue, true);
+            xhr.open("GET", "/Setting?value=" + sliderValue, true);
             xhr.send();
         }
     </script>

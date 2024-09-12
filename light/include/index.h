@@ -4,10 +4,9 @@ const char *index_html = R"=====(<!DOCTYPE html>
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Light control</title>
+    <title>Static light</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
             background-color: #ffffff;
             align-items: center;
             height: 100vh;
@@ -25,7 +24,6 @@ const char *index_html = R"=====(<!DOCTYPE html>
         }
 
         .pagination {
-            display: inline-block;
             display: flex;
             justify-content: center;
         }
@@ -35,43 +33,52 @@ const char *index_html = R"=====(<!DOCTYPE html>
             float: left;
             padding: 1vh 6vw;
             text-decoration: none;
-            transition: background-color .3s;
             border: 1px solid #ddd;
         }
 
         .pagination a.active {
             background-color: #9265fa;
+        }
+
+        input {
+            height: 5vh;
 
         }
     </style>
 </head>
 
 <body>
+
     <div>
         <div class="header">
             Control panel
         </div>
         <div class="pagination">
-            <a href="#">Static mode</a>
+            <a href="#" class="active">Static mode</a>
             <a href="#">Animated mode</a>
-            <a href="#" class="active">Setting</a>
+            <a href="./Setting.html">Setting</a>
         </div>
-        <div>
-            <h1 class="contain"> Static light</h1>
+            <h1>Static mode control panel</h1>
+            <br />
+                <br/>
+                <input type="color" value="%COLORS%" id="ColorInput" style="width:85%;">
+            </br>
+                Start pos:<input type="number" id="StartInput" min="0" max="%LEDNUM%">
+            </br>
+                End pos:<input type="number" id="EndInput" min="0" max="%LEDNUM%">
+            </br>
+                <button onclick="Change()" >Change</button>
 
 
-            %PLACEHOLDER%
-        </div>
-    </div>
+        <script>
+            function Change()
+                {
+                    
+                    var xhr = new XMLHttpRequest();
+                    xhr.open("GET", "/static?Start="+document.getElementById("StartInput").value+"&End="+document.getElementById("EndInput").value+"Color="+document.getElementById("ColorInput").value, true);
+                    xhr.send();
+                }
+        </script>
 </body>
-<script>
-    const colorInput = document.querySelector('input[type="color"]');
-
-    colorInput.addEventListener('change', (event) => {
-        const selectedColor = event.target.value;
-        const placeholderElement = document.querySelector('.contain');
-        placeholderElement.textContent = `Selected Color: ${selectedColor}`;
-    });
-</script>
 
 </html>)=====";

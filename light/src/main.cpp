@@ -10,11 +10,12 @@
 #include "control_panel.h"
 #include "Setting.h"
 
-#define NUM_LEDS 55
 
 #define DATA_PIN 5
 
-CRGB leds[NUM_LEDS];
+int NUM_LEDS =55;
+
+CRGB leds[55];
 
 const char* PARAM_INPUT = "value";
 
@@ -24,21 +25,40 @@ const char* ssid = "Change_this_to_your_ssid";
 const char* password = "Change_this_to_your_ss_password";
 
 AsyncWebServer server(80);
-int myFunction(int, int);
+
+//Turn int to string
+String intToStr(int N) {
+    int i = 0;
+    char *str;
+    // Save the copy of the number for sign
+    int sign = N;
+
+    // Extract digits from the number and add to string
+    while (N > 0) {
+      
+        // Convert integer digit to character and store in str
+        str[i++] = N % 10 + '0';
+          N /= 10;
+    } 
+
+    // Null-terminate the string
+    str[i] = '\0';
+
+    // Reverse the string to get the correct order
+    for (int j = 0, k = i - 1; j < k; j++, k--) {
+        char temp = str[j];
+        str[j] = str[k];
+        str[k] = temp;
+    }
+    return str;
+}
 
 
-String btos(bool x) 
-{ 
-    if (x) 
-        return "True"; 
-    return "False"; 
-} 
-
+//Process the placeholder 
 String processor(const String& var){
-  if(var == "PLACEHOLDER")
-    return "<h4><tr><th>esp1</th><th>no ida</th><th>" +btos(1)+ "</th></tr></h4>";
-  else return "";
-
+  if(var == "LEDNUM")
+    return "<h4>" + intToStr(NUM_LEDS) + "</h4>";
+    
     if (var == "SLIDERVALUE"){
     return PARAM_INPUT;
   }
@@ -71,7 +91,6 @@ void setup(){
     request->send(200, "text/html", index_html);
   });
 
-  // Send a GET request to <ESP_IP>/update?output=<inputMessage1>&state=<inputMessage2>
   server.on("/login.html", HTTP_GET, [] (AsyncWebServerRequest *request) {
     request->send(200, "text/html", login_html);
 
@@ -79,7 +98,6 @@ void setup(){
 
   server.on("/setting", HTTP_GET, [] (AsyncWebServerRequest *request) {
     String inputMessage;
-        // GET input1 value on <ESP_IP>/slider?value=<inputMessage>
       if (request->hasParam(PARAM_INPUT)) {
         inputMessage = request->getParam(PARAM_INPUT)->value();
         Brightness = inputMessage;
