@@ -55,9 +55,9 @@ const char *SETTING =R"=====(<!DOCTYPE html>
         <div>
             <h1 class="contain">Setting</h1>
 
-            <span id="textSliderValue">%BRIGHTNESS%</span></p>
+            <span id="textSliderValue">%BRIGHTVALUE%</span></p>
             <p><input type="range" onchange="updateSliderPWM(this)" id="pwmSlider" min="0" max="255"
-                    value="%BRIGHTNESS%" step="1" class="slider">
+                    value="%BRIGHTVALUE%" step="1" class="slider">
 
         </div>
     </div>
