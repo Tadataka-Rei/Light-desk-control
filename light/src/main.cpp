@@ -6,7 +6,6 @@
 #include "Error_404.h"
 #include "Error_405.h"
 #include "index.h"
-#include "login.h"
 #include "control_panel.h"
 #include "Setting.h"
 
@@ -21,8 +20,8 @@ const char* PARAM_INPUT = "value";
 
 String Brightness = "0";
 
-const char* ssid = "Change_this_to_your_ssid";
-const char* password = "Change_this_to_your_ss_password";
+const char* ssid = "Trung Hieu";
+const char* password = "23011992";
 
 AsyncWebServer server(80);
 
@@ -76,12 +75,10 @@ void setup(){
     delay(100);
   }
   
-  if(!MDNS.begin("smarttrash"))
+  if(!MDNS.begin("lightcontrol"))
   {
    Serial.print("Error setting up MDNS responder!"); 
   }
-  // Print ESP Local IP
-  Serial.println(WiFi.localIP());
 
   // Route for root
   server.on("/", HTTP_GET, [](AsyncWebServerRequest *request){
@@ -91,22 +88,17 @@ void setup(){
     request->send(200, "text/html", index_html);
   });
 
-  server.on("/login.html", HTTP_GET, [] (AsyncWebServerRequest *request) {
-    request->send(200, "text/html", login_html);
 
-  });
-
+//------ SETTING-----//
   server.on("/setting", HTTP_GET, [] (AsyncWebServerRequest *request) {
-    String inputMessage;
-      if (request->hasParam(PARAM_INPUT)) {
-        inputMessage = request->getParam(PARAM_INPUT)->value();
-        Brightness = inputMessage;
-      }
-      else {
-        inputMessage = "No message sent";
-      }
-      Serial.println(inputMessage);
-      request->send(200, "text/plain", "OK");
+    // String inputMessage;
+    //   if (request->hasParam(PARAM_INPUT)) {
+    //     inputMessage = request->getParam(PARAM_INPUT)->value();
+    //     Brightness = inputMessage;
+    //   }
+
+    //   Serial.println(inputMessage);
+      request->send(200, "text/html", SETTING);
   });
 
 
