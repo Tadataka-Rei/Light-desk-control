@@ -61,12 +61,12 @@ const char *index_html = R"=====(<!DOCTYPE html>
         <h1>Static mode control panel</h1>
         <br />
         <br />
-        <input type="color" value="%COLORS%" id="ColorInput" style="width:85%;">
+        <input type="color"  id="ColorInput" value="%COLORS%" style="width:85vw;">
         <button onclick="ChangeColor()">Change COLOR</button>
         </br>
-        Start pos:<input type="number" id="StartInput" min="0" max="%LEDNUM%">
+        Start pos:<input type="number"  id="StartInput" min="0" max="%LEDNUM%" value="%Spos%">
         </br>
-        End pos:<input type="number" id="EndInput" min="0" max="%LEDNUM%">
+        End pos:<input type="number" id="EndInput" min="0" max="%LEDNUM%" value="%Epos%">
         </br>
         <button onclick="Changepos()">Change POS</button>
 
@@ -74,13 +74,16 @@ const char *index_html = R"=====(<!DOCTYPE html>
         <script>
             function Changepos() {
                 var xhr = new XMLHttpRequest();
-                xhr.open("GET", "/changepos?Start=" + document.getElementById("StartInput").value + "&End=" + document.getElementById("EndInput").value, true);
+                xhr.open("GET", "/changepos?S=" + document.getElementById("StartInput").value + "&E=" + document.getElementById("EndInput").value, true);
                 xhr.send();
             }
             
             function ChangeColor() {
+                var hex = document.getElementById("ColorInput").value;
+                hex = hex.replace('#', '');
+
                 var xhr = new XMLHttpRequest();
-                xhr.open("GET","/changecolor?color=" + document.getElementById("ColorInput").value, true);
+                xhr.open("GET","/changecolor?color=" + hex , true);
                 xhr.send();
             }
         </script>

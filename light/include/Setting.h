@@ -55,19 +55,17 @@ const char *SETTING =R"=====(<!DOCTYPE html>
         <div>
             <h1 class="contain">Setting</h1>
 
-            <span id="textSliderValue">%BRIGHTVALUE%</span></p>
-            <p><input type="range" onchange="updateSliderPWM(this)" id="pwmSlider" min="0" max="255"
+            <p><input type="range" onchange="updatelight(this)" id="lightSlider" min="0" max="255"
                     value="%BRIGHTVALUE%" step="1" class="slider">
 
         </div>
     </div>
 
     <script>
-        function updateSliderPWM(element) {
-            var sliderValue = document.getElementById("pwmSlider").value;
-            document.getElementById("textSliderValue").innerHTML = sliderValue;
+        function updatelight(element) {
+            var sliderValue = document.getElementById("lightSlider").value;
             var xhr = new XMLHttpRequest();
-            xhr.open("GET", "/Setting?value=" + sliderValue, true);
+            xhr.open("GET", "/ChangeBright?value=" + sliderValue, true);
             xhr.send();
         }
     </script>

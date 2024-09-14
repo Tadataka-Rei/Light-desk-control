@@ -10,12 +10,16 @@
 
 
 #define DATA_PIN 5
-#define MAX_LED 70
 #define MIN_LED 0
+
+//IF YOU WANT TO CHANGE THE MAXIMUN LED then you have to change 2 70 bellow
+#define MAX_LED "70"
+CRGB leds[70];
+
 int NUM_LEDS =0;
+String POS[]= {"",""};
 
-CRGB leds[MAX_LED];
-
+String Colors="#000000";
 String Brightness = "0";
 
 const char* ssid = "Trung Hieu";
@@ -36,10 +40,7 @@ String intToStr(int N) {
           N /= 10;
     } 
 
-    // Null-terminate the string
     str[i] = '\0';
-
-    // Reverse the string
     for (int j = 0, k = i - 1; j < k; j++, k--) {
         char temp = str[j];
         str[j] = str[k];
@@ -52,10 +53,25 @@ String intToStr(int N) {
 //---Process the placeholder--- //
 String processor(const String& var){
   if(var == "LEDNUM")
-    return "<h4>" + intToStr(NUM_LEDS) + "</h4>";
-    
+  {
+    return MAX_LED;
+  }
+  if(var == "Spos")
+  {
+    return POS[0];
+  }
+
+  if(var == "Epos")
+  {
+    return POS[1];
+  }
     if (var == "BRIGHTVALUE"){
     return Brightness;
+  }
+
+  if (var == "COLORS")
+  {
+    return "#"+Colors;
   }
   return String();
 }
@@ -78,24 +94,55 @@ void setup(){
 
   // Route for root
   server.on("/", HTTP_GET, [](AsyncWebServerRequest *request){
-    request->send(200, "text/html", index_html);
+    request->send_P(200, "text/html", index_html, processor);
   });
     server.on("/index.html", HTTP_GET, [](AsyncWebServerRequest *request){
-    request->send(200, "text/html", index_html);
+    request->send_P(200, "text/html", index_html,processor);
   });
 
 
 //------ SETTING-----//
   server.on("/setting", HTTP_GET, [] (AsyncWebServerRequest *request) {
-    // String inputMessage;
-    //   if (request->hasParam("value")) {
-    //     inputMessage = request->getParam("value")->value();
-    //     Brightness = inputMessage;
-    //   }
-
-    //   Serial.println(inputMessage);
-      request->send(200, "text/html", SETTING);
+      request->send_P(200, "text/html", SETTING, processor);
   });
+
+
+// -----------LOGIC------------//
+//BRIGHTNESS
+  server.on("/ChangeBright", HTTP_GET, [] (AsyncWebServerRequest *request) {
+      if (request->hasParam("value")) {
+        Brightness =  request->getParam("value")->value();
+      }
+
+      request->send(200, "text/plain", Brightness);
+  });
+//COLOR
+    server.on("/changecolor", HTTP_GET, [] (AsyncWebServerRequest *request) {
+      if (request->hasParam("color")) {
+        Colors = request->getParam("color")->value();
+        Serial.print("Have color and is:");
+        Serial.print(Colors);
+      }
+
+      request->send(200, "text/plain", Colors);
+  });
+//POS
+
+   server.on("/changepos", HTTP_GET, [] (AsyncWebServerRequest *request) {
+        int paramsNr = request->params();
+
+    for (int i = 0; i < paramsNr; i++)
+    {
+      AsyncWebParameter* p = request->getParam(i);
+      if(i<2)
+      POS[i] = p->value();
+
+    }
+
+    request->send(200, "text/plain", "message received");
+
+  });
+
 
 //--------- ERROR----------//
   server.onNotFound([](AsyncWebServerRequest *request) {
@@ -105,6 +152,8 @@ void setup(){
       request->send(405, "text/html", HTML_CONTENT_405);
     }
   });
+
+
   server.begin();
 }
 
