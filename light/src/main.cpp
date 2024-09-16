@@ -9,17 +9,18 @@
 #include "Setting.h"
 
 
-#define DATA_PIN 5
+#define DATA_PIN 5 //change the data pin as you like
 #define MIN_LED 0
 
-//IF YOU WANT TO CHANGE THE MAXIMUN LED then you have to change 2 70 bellow
-#define MAX_LED "70"
-CRGB leds[70];
+//IF YOU WANT TO CHANGE THE MAXIMUN LED then you have to change 2 55 bellow
+#define MAX_LED 55
+CRGB leds[55];
 
 int NUM_LEDS =0;
 String POS[]= {"",""};
 
 String Colors="#000000";
+int red=255, green=255, blue=255;
 String Brightness = "0";
 
 const char* ssid = "Trung Hieu";
@@ -27,34 +28,13 @@ const char* password = "23011992";
 
 AsyncWebServer server(80);
 
-//Turn int to string
-String intToStr(int N) {
-    int i = 0;
-    char *str;
-    int sign = N;
-
-    // Extract digits from the number and add to string
-    while (N > 0) {
-        // Convert integer digit to character and store in str
-        str[i++] = N % 10 + '0';
-          N /= 10;
-    } 
-
-    str[i] = '\0';
-    for (int j = 0, k = i - 1; j < k; j++, k--) {
-        char temp = str[j];
-        str[j] = str[k];
-        str[k] = temp;
-    }
-    return str;
-}
 
 
 //---Process the placeholder--- //
 String processor(const String& var){
   if(var == "LEDNUM")
   {
-    return MAX_LED;
+    return String(MAX_LED);
   }
   if(var == "Spos")
   {
@@ -76,10 +56,36 @@ String processor(const String& var){
   return String();
 }
 
+//     -------------- LOGIC FUNCTONS ----   ///////
+void decode_color(String hexCode)
+{
+    for (int i = 0; i < 6; i += 2) {
+        char highNibble = toupper(hexCode[i]);
+        char lowNibble = toupper(hexCode[i + 1]);
+
+        // Convert hexadecimal characters to decimal values
+        int value = (highNibble >= 'A' ? highNibble - 'A' + 10 : highNibble - '0') * 16 +
+                   (lowNibble >= 'A' ? lowNibble - 'A' + 10 : lowNibble - '0');
+        if (i == 0) {
+            red = value;
+        } else if (i == 2) {
+            green = value;
+        }
+            blue = value;
+    }
+}
+
+
+void Static_color()
+{
+  fill_solid(leds,MAX_LED, CRGB(green,red,blue));
+
+  FastLED.show();
+}
+// ---------SETUP-------//
 void setup(){
   Serial.begin(115200);
-
-  FastLED.addLeds<WS2812B, DATA_PIN, RGB>(leds, NUM_LEDS);
+  FastLED.addLeds<WS2812B, DATA_PIN, RGB>(leds, MAX_LED);
 
 
   WiFi.begin(ssid, password);
@@ -120,10 +126,10 @@ void setup(){
     server.on("/changecolor", HTTP_GET, [] (AsyncWebServerRequest *request) {
       if (request->hasParam("color")) {
         Colors = request->getParam("color")->value();
-        Serial.print("Have color and is:");
-        Serial.print(Colors);
+        decode_color(Colors);
       }
 
+      
       request->send(200, "text/plain", Colors);
   });
 //POS
@@ -138,7 +144,6 @@ void setup(){
       POS[i] = p->value();
 
     }
-
     request->send(200, "text/plain", "message received");
 
   });
@@ -158,5 +163,4 @@ void setup(){
 }
 
 void loop() {
-
 }
