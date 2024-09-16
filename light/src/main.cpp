@@ -6,39 +6,86 @@
 #include "Error_404.h"
 #include "Error_405.h"
 #include "index.h"
-#include "login.h"
-#include "control_panel.h"
+#include "Setting.h"
 
-#define NUM_LEDS 55
 
-#define DATA_PIN 5
+#define DATA_PIN 5 //change the data pin as you like
+#define MIN_LED 0
 
-CRGB leds[NUM_LEDS];
+//IF YOU WANT TO CHANGE THE MAXIMUN LED then you have to change 2 55 bellow
+#define MAX_LED 55
+CRGB leds[55];
 
-const char* ssid = "Change_this_to_your_ssid";
-const char* password = "Change_this_to_your_ss_password";
+int NUM_LEDS =0;
+String POS[]= {"",""};
+
+String Colors="#000000";
+int red=255, green=255, blue=255;
+String Brightness = "0";
+
+const char* ssid = "REPLACE_WITH_YOURS";
+const char* password = "REPLACE_WITH_YOURS";
 
 AsyncWebServer server(80);
-int myFunction(int, int);
 
 
-String btos(bool x) 
-{ 
-    if (x) 
-        return "True"; 
-    return "False"; 
-} 
 
+//---Process the placeholder--- //
 String processor(const String& var){
-  if(var == "PLACEHOLDER")
-    return "<h4><tr><th>esp1</th><th>no ida</th><th>" +btos(1)+ "</th></tr></h4>";
-  else return "";
+  if(var == "LEDNUM")
+  {
+    return String(MAX_LED);
+  }
+  if(var == "Spos")
+  {
+    return POS[0];
+  }
+
+  if(var == "Epos")
+  {
+    return POS[1];
+  }
+    if (var == "BRIGHTVALUE"){
+    return Brightness;
+  }
+
+  if (var == "COLORS")
+  {
+    return "#"+Colors;
+  }
+  return String();
 }
 
+//     -------------- LOGIC FUNCTONS ----   ///////
+void decode_color(String hexCode)
+{
+    for (int i = 0; i < 6; i += 2) {
+        char highNibble = toupper(hexCode[i]);
+        char lowNibble = toupper(hexCode[i + 1]);
+
+        // Convert hexadecimal characters to decimal values
+        int value = (highNibble >= 'A' ? highNibble - 'A' + 10 : highNibble - '0') * 16 +
+                   (lowNibble >= 'A' ? lowNibble - 'A' + 10 : lowNibble - '0');
+        if (i == 0) {
+            red = value;
+        } else if (i == 2) {
+            green = value;
+        }
+            blue = value;
+    }
+}
+
+
+void Static_color()
+{
+  fill_solid(leds,MAX_LED, CRGB(green,red,blue));
+
+  FastLED.show();
+}
+// ---------SETUP-------//
 void setup(){
   Serial.begin(115200);
-
-  FastLED.addLeds<WS2812B, DATA_PIN, RGB>(leds, NUM_LEDS);
+  FastLED.addLeds<WS2812B, DATA_PIN, RGB>(leds, MAX_LED);
 
 
   WiFi.begin(ssid, password);
@@ -46,41 +93,74 @@ void setup(){
     delay(100);
   }
   
-  if(!MDNS.begin("smarttrash"))
+  if(!MDNS.begin("lightcontrol"))
   {
    Serial.print("Error setting up MDNS responder!"); 
   }
-  // Print ESP Local IP
-  Serial.println(WiFi.localIP());
 
   // Route for root
   server.on("/", HTTP_GET, [](AsyncWebServerRequest *request){
-    request->send(200, "text/html", index_html);
+    request->send_P(200, "text/html", index_html, processor);
   });
     server.on("/index.html", HTTP_GET, [](AsyncWebServerRequest *request){
-    request->send(200, "text/html", index_html);
-  });
-
-  // Send a GET request to <ESP_IP>/update?output=<inputMessage1>&state=<inputMessage2>
-  server.on("/login.html", HTTP_GET, [] (AsyncWebServerRequest *request) {
-    request->send(200, "text/html", login_html);
-  });
-  server.on("/ControlPanel.html", HTTP_GET, [] (AsyncWebServerRequest *request) {
-    request->send_P(200, "text/html", Control_panel_html, processor);
+    request->send_P(200, "text/html", index_html,processor);
   });
 
 
+//------ SETTING-----//
+  server.on("/setting", HTTP_GET, [] (AsyncWebServerRequest *request) {
+      request->send_P(200, "text/html", SETTING, processor);
+  });
+
+
+// -----------LOGIC------------//
+//BRIGHTNESS
+  server.on("/ChangeBright", HTTP_GET, [] (AsyncWebServerRequest *request) {
+      if (request->hasParam("value")) {
+        Brightness =  request->getParam("value")->value();
+      }
+
+      request->send(200, "text/plain", Brightness);
+  });
+//COLOR
+    server.on("/changecolor", HTTP_GET, [] (AsyncWebServerRequest *request) {
+      if (request->hasParam("color")) {
+        Colors = request->getParam("color")->value();
+        decode_color(Colors);
+      }
+
+      
+      request->send(200, "text/plain", Colors);
+  });
+//POS
+
+   server.on("/changepos", HTTP_GET, [] (AsyncWebServerRequest *request) {
+        int paramsNr = request->params();
+
+    for (int i = 0; i < paramsNr; i++)
+    {
+      AsyncWebParameter* p = request->getParam(i);
+      if(i<2)
+      POS[i] = p->value();
+
+    }
+    request->send(200, "text/plain", "message received");
+
+  });
+
+
+//--------- ERROR----------//
   server.onNotFound([](AsyncWebServerRequest *request) {
     if (request->method() == HTTP_GET) {
       request->send(404, "text/html", HTML_CONTENT_404);
-      Serial.println("not found");
     } else {
       request->send(405, "text/html", HTML_CONTENT_405);
     }
   });
+
+
   server.begin();
 }
 
 void loop() {
-  // put your main code here, to run repeatedly:
 }
