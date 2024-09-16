@@ -23,8 +23,8 @@ String Colors="#000000";
 int red=255, green=255, blue=255;
 String Brightness = "0";
 
-const char* ssid = "Trung Hieu";
-const char* password = "23011992";
+const char* ssid = "REPLACE_WITH_YOURS";
+const char* password = "REPLACE_WITH_YOURS";
 
 AsyncWebServer server(80);
 
