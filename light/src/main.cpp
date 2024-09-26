@@ -23,8 +23,8 @@ String Colors="#000000";
 int red=255, green=255, blue=255;
 String Brightness = "0";
 
-const char* ssid = "REPLACE_WITH_YOURS";
-const char* password = "REPLACE_WITH_YOURS";
+const char* ssid = "Trung Hieu";
+const char* password = "23011992";
 
 AsyncWebServer server(80);
 
@@ -146,6 +146,7 @@ void setup(){
       if (request->hasParam("color")) {
         Colors = request->getParam("color")->value();
         decode_color(Colors);
+        Static_color();
       }
 
       
@@ -155,7 +156,6 @@ void setup(){
 
    server.on("/changepos", HTTP_GET, [] (AsyncWebServerRequest *request) {
         int paramsNr = request->params();
-
     for (int i = 0; i < paramsNr; i++)
     {
       AsyncWebParameter* p = request->getParam(i);
@@ -163,6 +163,7 @@ void setup(){
       POS[i] = p->value();
 
     }
+    Static_color();
     request->send(200, "text/plain", "message received");
 
   });
@@ -178,7 +179,7 @@ void setup(){
   });
 
   FastLED.clear();
-
+  FastLED.show();
 
   server.begin();
 }
