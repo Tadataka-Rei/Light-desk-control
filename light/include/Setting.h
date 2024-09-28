@@ -52,22 +52,20 @@ const char *SETTING =R"=====(<!DOCTYPE html>
             <a href="#">Animated mode</a>
             <a href="#" class="active">Setting</a>
         </div>
-        <div>
-            <h1 class="contain">Setting</h1>
-
-            <p><input type="range" onchange="updatelight(this)" id="lightSlider" min="0" max="255"
-                    value="%BRIGHTVALUE%" step="1" class="slider">
-
-        </div>
-    </div>
+          <h1>ESP32 Status</h1>
+          <p>
+            <b>WiFi Connection:</b> 
+            <?php if (WiFi.status() == WL_CONNECTED): ?>
+              Connected to <span style="color:green;"><?php echo WiFi.SSID(); ?></span>
+            <?php else: ?>
+              Disconnected
+            <?php endif; ?>
+          </p>
+          <p>
+            <b>Free Heap:</b> <?php echo ESP.getFreeHeap(); ?> bytes
+          </p>
 
     <script>
-        function updatelight(element) {
-            var sliderValue = document.getElementById("lightSlider").value;
-            var xhr = new XMLHttpRequest();
-            xhr.open("GET", "/ChangeBright?value=" + sliderValue, true);
-            xhr.send();
-        }
     </script>
 </body>
 

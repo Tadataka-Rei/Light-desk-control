@@ -7,6 +7,7 @@
 #include "Error_405.h"
 #include "index.h"
 #include "Setting.h"
+// #include "SPIFFS.h" for future intended project
 
 
 #define DATA_PIN 5 //change the data pin as you like
@@ -23,8 +24,8 @@ String Colors="#000000";
 int red=255, green=255, blue=255;
 String Brightness = "0";
 
-const char* ssid = "REPLACE_WITH_YOURS";
-const char* password = "REPLACE_WITH_YOURS";
+const char* ssid = "Trung Hieu";
+const char* password = "23011992";
 
 AsyncWebServer server(80);
 
@@ -74,14 +75,40 @@ void decode_color(String hexCode)
             blue = value;
     }
 }
+ // STRING TO INT
+int Str_To_int(String a)
+{
+  int i=0;
+    for (char c : a) {
+      if (c >= '0' && c <= '9') {
+          i = i * 10 + (c - '0');
+      }
+    }
+  return i;
+}
 
-
+//FILL FROM THE DESTINATE POSITION WITH THE COLOR OF CHOICE
 void Static_color()
 {
-  fill_solid(leds,MAX_LED, CRGB(green,red,blue));
+  FastLED.clear();
+  if (POS[0] != "" && POS[1] != "")
+  {
+    int start = Str_To_int(POS[0]);
+    int end = Str_To_int(POS[1]);
+    if(end < start) end=start;
+    for (int i = start; i <= end; i++)
+    {
+      leds[i] = CRGB(red, green, blue);
+    }
+  }
+  else
+  {
+    fill_solid(leds,MAX_LED, CRGB(green,red,blue));
+  }
 
   FastLED.show();
 }
+
 // ---------SETUP-------//
 void setup(){
   Serial.begin(115200);
@@ -98,7 +125,7 @@ void setup(){
    Serial.print("Error setting up MDNS responder!"); 
   }
 
-  // Route for root
+  // --------INDEX------------//
   server.on("/", HTTP_GET, [](AsyncWebServerRequest *request){
     request->send_P(200, "text/html", index_html, processor);
   });
@@ -108,25 +135,19 @@ void setup(){
 
 
 //------ SETTING-----//
-  server.on("/setting", HTTP_GET, [] (AsyncWebServerRequest *request) {
+  server.on("/setting.html", HTTP_GET, [] (AsyncWebServerRequest *request) {
       request->send_P(200, "text/html", SETTING, processor);
   });
 
 
 // -----------LOGIC------------//
-//BRIGHTNESS
-  server.on("/ChangeBright", HTTP_GET, [] (AsyncWebServerRequest *request) {
-      if (request->hasParam("value")) {
-        Brightness =  request->getParam("value")->value();
-      }
 
-      request->send(200, "text/plain", Brightness);
-  });
 //COLOR
     server.on("/changecolor", HTTP_GET, [] (AsyncWebServerRequest *request) {
       if (request->hasParam("color")) {
         Colors = request->getParam("color")->value();
         decode_color(Colors);
+        Static_color();
       }
 
       
@@ -136,7 +157,6 @@ void setup(){
 
    server.on("/changepos", HTTP_GET, [] (AsyncWebServerRequest *request) {
         int paramsNr = request->params();
-
     for (int i = 0; i < paramsNr; i++)
     {
       AsyncWebParameter* p = request->getParam(i);
@@ -144,6 +164,7 @@ void setup(){
       POS[i] = p->value();
 
     }
+    Static_color();
     request->send(200, "text/plain", "message received");
 
   });
@@ -158,6 +179,8 @@ void setup(){
     }
   });
 
+  FastLED.clear();
+  FastLED.show();
 
   server.begin();
 }
