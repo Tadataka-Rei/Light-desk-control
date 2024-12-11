@@ -11,6 +11,9 @@
 // override any default weak definition.
 #if defined(NRF52_SERIES)
 
+    #include "platforms/arm/nrf52/led_sysdefs_arm_nrf52.h"
+    #include "platforms/arm/nrf52/arbiter_nrf52.h"
+
     uint32_t isrCount;
 
     #ifdef __cplusplus
@@ -33,4 +36,9 @@
         }
     #endif
 
-#endif 
+#endif // defined(NRF52_SERIES)
+
+
+
+// FASTLED_NAMESPACE_BEGIN
+// FASTLED_NAMESPACE_END
